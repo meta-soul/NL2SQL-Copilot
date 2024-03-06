@@ -1,0 +1,3 @@
+[submodule "Chat2DB"]
+	path = Chat2DB
+	url = git@github.com:wikty/Chat2DB.git
