@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List, Dict, Any
 
 @dataclass
 class ModelFootpoint:
@@ -11,6 +11,7 @@ class ModelFootpoint:
     model: any = None
     tokenizer: any = None
     tags: List[str] = field(default_factory=list)
+    gen_kwargs: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
 class Context:

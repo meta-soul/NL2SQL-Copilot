@@ -92,7 +92,7 @@ def main():
                 continue
 
             context.llm_models[llm['name']] = ModelFootpoint(llm['name'], llm['type'],
-                model, tokenizer, llm.get('tags', []))
+                model, tokenizer, llm.get('tags', []), llm.get('gen_kwargs', {}))
             print(f">> Load DONE!")
 
 

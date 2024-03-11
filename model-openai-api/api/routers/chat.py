@@ -50,19 +50,22 @@ async def chat_completions(body: ChatCompletionBody, request: Request, backgroun
             assistant_answer = message.content
             history.append((user_question, assistant_answer))
 
-    model_name, temperature, top_p, max_tokens, stop_tokens = body.model, body.temperature, body.top_p, body.max_tokens, body.stop
-    print(f"prompt = {question}, model = {model_name}, temperature = {temperature}, top_p = {top_p}, stop_tokens = {stop_tokens}, max_tokens = {max_tokens}, history = {history}")
+    model_name = body.model
+    gen_kwargs = {
+        "temperature": body.temperature,
+        "top_p": body.top_p,
+        "max_tokens": body.max_tokens,
+        "stop": body.stop or model_point.gen_kwargs.get("stop_token", None),
+        "start": model_point.gen_kwargs.get("start_token", None),
+    }
+    print(f"prompt = {question}, history = {history}, model = {model_name}, gen_kwargs = {gen_kwargs}")
 
     if body.stream:
         async def eval_llm():
             first = True
             for response in model_point.model.do_chat_stream(
-                model_point.model, model_point.tokenizer, question, history, {
-                    "temperature": temperature,
-                    "top_p": top_p,
-                    "max_tokens": max_tokens,
-                    #"stop": stop_tokens,
-                }):
+                    model_point.model, model_point.tokenizer, 
+                    question, history, gen_kwargs):
                 if first:
                     first = False
                     yield json.dumps(generate_stream_response_start(model=model_name),
@@ -72,10 +75,6 @@ async def chat_completions(body: ChatCompletionBody, request: Request, backgroun
             yield "[DONE]"
         return EventSourceResponse(eval_llm(), ping=10000)
     else:
-        response = model_point.model.do_chat(model_point.model, model_point.tokenizer, question, history, {
-            "temperature": temperature,
-            "top_p": top_p,
-            "max_tokens": max_tokens,
-            #"stop": stop_tokens,
-        })
+        response = model_point.model.do_chat(model_point.model, model_point.tokenizer, 
+            question, history, gen_kwargs)
         return JSONResponse(content=generate_response(response, model=model_name))

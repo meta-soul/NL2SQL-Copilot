@@ -18,6 +18,10 @@ pip install -r requirements.txt
 
 复制模版配置文件 `conf/config-example.toml` 为 `conf/config.toml`，默认可不更改内容，如需修改参考下面配置文件的具体说明。
 
+```bash
+cp conf/config-example.toml conf/config.toml
+```
+
 2）启动服务
 
 ```bash

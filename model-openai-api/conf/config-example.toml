@@ -24,6 +24,9 @@ cache_dir = "./.cache"
     # Or huggingface id
     path = "DMetaSoul/nl2sql-chinese-basic"
     tags = ["chat"]
+      [models.llm."nl2sql-v2".gen_kwargs]
+      start_token = "en_XX "
+      stop_token = "</s>"
 
   [models.embeddings]
     [models.embeddings."chinese-large-emb"]
