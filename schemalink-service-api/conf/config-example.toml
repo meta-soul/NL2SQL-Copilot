@@ -1,0 +1,28 @@
+[service]
+  [service.base_args]
+  host = "0.0.0.0"
+  port = 18022
+  public = true # 任何人都可以访问，反之则需要检查 auth tokens
+  cache_dir = "./.cache"
+  [service.result_args]
+  # schema linking 截断设置
+  table_threshold = 0
+  column_threshold = 0
+  show_table_nums = 10000
+  show_column_nums = 10000
+  sort = true
+
+[models]
+  [models."schema-linking"]
+    [models."schema-linking"."schema-linking-base"]
+    name = "schema-linking-base"
+    path = "http://im-api.dmetasoul.com/nl2sql/schema-linking/v1.tar.gz"
+    #path = "DMetaSoul/nl2sql-schema-linking-base"
+    model_args={}
+    tags = ["schema_linking"]
+
+[auth]
+tokens = [
+    "ak_84ff9c1c-4758-494b-b6fd-2f21f06650c3", 
+    "ak_311e0e1b-2e4a-44b6-8213-ae19b6fccb81"
+]

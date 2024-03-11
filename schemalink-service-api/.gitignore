@@ -1,0 +1,6 @@
+/conf/config.toml
+__pycache__
+*.pyc
+*.log
+*.pid
+.cache
