@@ -79,6 +79,69 @@
           args = []
           kwargs = {decoder_version="v1"}
 
+    [openai.service."llm-6b"]
+      type = "llm"
+      route_prefix = "/llm-6b"
+      base_url = "http://127.0.0.1:18021"
+      timeout = 300
+      [openai.service."llm-6b".conf]
+        [openai.service."llm-6b".conf.model]
+          # the model name pass to model api
+          name = "nl2sql-6b"
+        [openai.service."llm-6b".conf.prompt]
+          # the generated prompt's version for model input
+          # v3 => seq2seq style, v4 => codex/chatgpt style
+          version = "v3"
+        [[openai.service."llm-6b".conf.pre]]
+          name = "pre_chat_payload_parser"
+          args = []
+          kwargs = {}
+        [[openai.service."llm-6b".conf.pre]]
+          name = "pre_prompt_parser"
+          args = []
+          # the input chat2db's prompt version
+          kwargs = {prompt_version="v3"}
+        [[openai.service."llm-6b".conf.pre]]
+          name = "pre_prompt_generator"
+          args = []
+          kwargs = {}
+        [[openai.service."llm-6b".conf.pre]]
+          name = "pre_chat_payload_generator"
+          args = []
+          kwargs = {}
+
+    [openai.service."llm-7b"]
+      type = "llm"
+      route_prefix = "/llm-7b"
+      base_url = "http://127.0.0.1:18021"
+      timeout = 300
+      [openai.service."llm-7b".conf]
+        [openai.service."llm-7b".conf.model]
+          # the model name pass to model api
+          name = "nl2sql-7b"
+        [openai.service."llm-7b".conf.prompt]
+          # the generated prompt's version for model input
+          # v3 => seq2seq style, v4 => codex/chatgpt style
+          # v5 => create table ddl
+          version = "v5"
+        [[openai.service."llm-7b".conf.pre]]
+          name = "pre_chat_payload_parser"
+          args = []
+          kwargs = {}
+        [[openai.service."llm-7b".conf.pre]]
+          name = "pre_prompt_parser"
+          args = []
+          # the input chat2db's prompt version
+          kwargs = {prompt_version="v3"}
+        [[openai.service."llm-7b".conf.pre]]
+          name = "pre_prompt_generator"
+          args = []
+          kwargs = {}
+        [[openai.service."llm-7b".conf.pre]]
+          name = "pre_chat_payload_generator"
+          args = []
+          kwargs = {}
+
     [openai.service.openai]
       type = "openai"
       route_prefix = "/openai"
@@ -110,33 +173,3 @@
           args = []
           kwargs = {}
 
-    [openai.service.llm]
-      type = "llm"
-      route_prefix = "/llm"
-      base_url = "http://127.0.0.1:18021"
-      timeout = 300
-      [openai.service.llm.conf]
-        [openai.service.llm.conf.model]
-          # the model name pass to model api
-          name = "chatglm-6b"
-        [openai.service.llm.conf.prompt]
-          # the generated prompt's version for model input
-          # v3 => seq2seq style, v4 => codex/chatgpt style
-          version = "v3"
-        [[openai.service.llm.conf.pre]]
-          name = "pre_chat_payload_parser"
-          args = []
-          kwargs = {}
-        [[openai.service.llm.conf.pre]]
-          name = "pre_prompt_parser"
-          args = []
-          # the input chat2db's prompt version
-          kwargs = {prompt_version="v3"}
-        [[openai.service.llm.conf.pre]]
-          name = "pre_prompt_generator"
-          args = []
-          kwargs = {}
-        [[openai.service.llm.conf.pre]]
-          name = "pre_chat_payload_generator"
-          args = []
-          kwargs = {}

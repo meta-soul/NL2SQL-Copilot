@@ -8,7 +8,7 @@ class TableSchema(TableSchemaBase):
 
 
     @classmethod
-    def parse_from_str(cls, create_table_sql, comments={}):
+    def parse_from_str(cls, create_table_sql, comments={}, is_ddl=False):
         lines = create_table_sql.split('\n')
         tbl_name, tbl_comment, columns, constraints = "", "", [], {}
         start_create_tbl = False
@@ -82,6 +82,9 @@ class TableSchema(TableSchemaBase):
             tbl.add_column(cn, col_comment=cc, col_type=ct, 
                 primary_key=is_primary, reference_key=ref_key)
 
+        if is_ddl:
+            tbl._ddl = create_table_sql.strip()
+
         return tbl
 
 
@@ -142,7 +145,7 @@ class DatabaseSchema(DatabaseSchemaBase):
             if not sql:
                 continue
             #print(sql, i, j)
-            tbl = TableSchema.parse_from_str(sql, comments)
+            tbl = TableSchema.parse_from_str(sql, comments, is_ddl=True)
             if tbl is None:
                 continue
             db.add_table(tbl)

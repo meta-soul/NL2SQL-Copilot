@@ -34,7 +34,8 @@ sh start.sh 18080 conf/config.toml
 - `/nl2sql/elementary/` -> 自研模型（基础版）：`sh client.sh 18080 elementary nl2sql-v1`
 - `/nl2sql/intermediate/` -> 自研模型（升级版）：`sh client.sh 18080 intermediate nl2sql-v2`
 - `/nl2sql/openai/` -> OpenAI 类似服务：`sh client.sh 18080 openai gpt-3.5-turbo <api_key>`
-- `nl2sql/llm/` -> LLM 模型：`sh client.sh 18080 llm chatglm-6b`
+- `/nl2sql/llm-6b/` -> LLM 模型：`sh client.sh 18080 llm-6b nl2sql-6b`
+- `/nl2sql/llm-7b/` -> LLM 模型：`sh client.sh 18080 llm-7b nl2sql-7b`
 
 每种 NL2SQL 服务通过灵活配置，具备不同的能力。其中仅自研模型（基础版）接受字符串简写格式作为输入，跟离线自研模型一致；另外的自研模型（升级版）和 OpenAI 服务均接受数据库创建语句格式，跟 Chat2DB 一致（后文详细说明）。
 

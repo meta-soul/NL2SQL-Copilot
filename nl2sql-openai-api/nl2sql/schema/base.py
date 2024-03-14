@@ -45,10 +45,16 @@ class TableSchemaBase:
         self.table_id = table_id
         self.ref_db = ref_db
         self.columns = []
+        self._ddl = ""
 
     @property
     def id(self):
         return self.table_id or self.name
+
+    @property
+    def ddl(self):
+        # TODO: create ddl via the intermediate objects
+        return self._ddl
 
     def to_dict(self):
         return {

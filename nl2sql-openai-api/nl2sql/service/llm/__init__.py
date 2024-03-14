@@ -5,6 +5,7 @@ class LLMService(ServiceBase):
     """
     prompt v3: table and column with original name + primary-foregin key
     prompt v4: codex/openai style prompt
+    prompt v5: create table ddl
     """
 
     @property
@@ -30,6 +31,8 @@ class LLMService(ServiceBase):
         tbl_name, tbl_comment = tbl.name, tbl.comment
         if prompt_version == 'v4':
             return f"# Table {tbl_name}, columns = [ {', '.join(columns)} ]"
+        elif prompt_version == 'v5':
+            return tbl.ddl
 
         return f"{tbl_name}: {' , '.join(columns)}"
     
@@ -37,6 +40,8 @@ class LLMService(ServiceBase):
         db_name, db_comment, db_type = db.name, db.comment, db.type
         if prompt_version == "v4":
             return f"# {db_type} SQL tables, with their properties:\n" + "\n".join(tables)
+        elif prompt_version == "v5":
+            return "\n".join(tables)
 
         tables = tables[:]
         pkeys = db.get_primary_keys()
@@ -51,5 +56,16 @@ class LLMService(ServiceBase):
     def make_prompt(self, schema, question, prompt_version="v1", **kwargs):
         if prompt_version == "v4":
             return "# Text to SQL 任务，根据输入的自然语言和数据表结构，生成 SQL" + "\n" + schema + "\n" + f"# Create a query for question: {question}"
+        elif prompt_version == "v5":
+            return f"""### Task
+Generate a SQL query to answer [QUESTION]{question}[/QUESTION]
+
+### Database Schema
+The query will run on a database with the following schema:
+{schema}
+
+### Answer
+Given the database schema, here is the SQL query that [QUESTION]{question}[/QUESTION]
+[SQL]"""
 
         return f"将自然语言问题 Question 转换为SQL语句，数据库的表结构由 Tables 提供。仅返回SQL语句，不要进行解释。\nQuestion: {question} <sep> {schema} <sep>"
