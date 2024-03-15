@@ -3,6 +3,7 @@ import tarfile
 import zipfile
 import requests
 
+from .clm import init_clm
 from .chatglm import init_chatglm
 from .phoenix import init_phoenix
 from .seq2seq import init_seq2seq

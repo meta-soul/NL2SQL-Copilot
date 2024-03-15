@@ -54,3 +54,101 @@ time curl ${API_BASE}/v1/chat/completions \
     "temperature": 0.1
   }'
 echo -e "\n"
+
+prompt_x=$(cat <<-END
+### Task
+Generate a SQL query to answer [QUESTION]在云南省的所有城市里找出一家名为海盗船自助餐的餐厅。[/QUESTION]
+
+### Database Schema
+The query will run on a database with the following schema:
+CREATE TABLE "business" (
+"bid" int,
+"business_id" text,
+"name" text,
+"full_address" text,
+"city" text,
+"latitude" text,
+"longitude" text,
+"review_count" int,
+"is_open" int,
+"rating" real,
+"state" text,
+primary key("bid")
+);
+CREATE TABLE "category" (
+"id" int,
+"business_id" text,
+"category_name" text,
+primary key("id"),
+foreign key("business_id") references business("business_id")
+);
+CREATE TABLE "user" (
+"uid" int,
+"user_id" text,
+"name" text,
+primary key("uid")
+);
+CREATE TABLE "checkin" (
+"cid" int,
+"business_id" text,
+"count" int,
+"day" text,
+primary key("cid"),
+foreign key("business_id") references business("business_id")
+);
+
+CREATE TABLE "neighbourhood" (
+"id" int,
+"business_id" text,
+"neighbourhood_name" text,
+primary key("id"),
+foreign key("business_id") references business("business_id")
+);
+
+CREATE TABLE "review" (
+"rid" int,
+"business_id" text,
+"user_id" text,
+"rating" real,
+"text" text,
+"year" int,
+"month" text,
+primary key("rid"),
+foreign key("business_id") references business("business_id"),
+foreign key("user_id") references user("user_id")
+);
+CREATE TABLE "tip" (
+"tip_id" int,
+"business_id" text,
+"text" text,
+"user_id" text,
+"likes" int,
+"year" int,
+"month" text,
+primary key("tip_id")
+foreign key("business_id") references business("business_id"),
+foreign key("user_id") references user("user_id")
+
+);
+
+
+### Answer
+Given the database schema, here is the SQL query that [QUESTION]在云南省的所有城市里找出一家名为海盗船自助餐的餐厅。[/QUESTION]
+[SQL]
+END
+)
+
+echo "/v1/chat/completions"
+time curl ${API_BASE}/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $API_KEY" \
+  -d '{
+    "model": '\"${MODEL_NAME}\"',
+    "messages": [
+        {
+            "role": "user",
+            "content": "### Task\nGenerate a SQL query to answer [QUESTION]在云南省的所有城市里找出一家名为海盗船自助餐的餐厅。[/QUESTION]\n\n### Database Schema\nThe query will run on a database with the following schema:\nCREATE TABLE \"business\" (\n\"bid\" int,\n\"business_id\" text,\n\"name\" text,\n\"full_address\" text,\n\"city\" text,\n\"latitude\" text,\n\"longitude\" text,\n\"review_count\" int,\n\"is_open\" int,\n\"rating\" real,\n\"state\" text,\nprimary key(\"bid\")\n);\nCREATE TABLE \"category\" (\n\"id\" int,\n\"business_id\" text,\n\"category_name\" text,\nprimary key(\"id\"),\nforeign key(\"business_id\") references business(\"business_id\")\n);\nCREATE TABLE \"user\" (\n\"uid\" int,\n\"user_id\" text,\n\"name\" text,\nprimary key(\"uid\")\n);\nCREATE TABLE \"checkin\" (\n\"cid\" int,\n\"business_id\" text,\n\"count\" int,\n\"day\" text,\nprimary key(\"cid\"),\nforeign key(\"business_id\") references business(\"business_id\")\n);\n\nCREATE TABLE \"neighbourhood\" (\n\"id\" int,\n\"business_id\" text,\n\"neighbourhood_name\" text,\nprimary key(\"id\"),\nforeign key(\"business_id\") references business(\"business_id\")\n);\n\nCREATE TABLE \"review\" (\n\"rid\" int,\n\"business_id\" text,\n\"user_id\" text,\n\"rating\" real,\n\"text\" text,\n\"year\" int,\n\"month\" text,\nprimary key(\"rid\"),\nforeign key(\"business_id\") references business(\"business_id\"),\nforeign key(\"user_id\") references user(\"user_id\")\n);\nCREATE TABLE \"tip\" (\n\"tip_id\" int,\n\"business_id\" text,\n\"text\" text,\n\"user_id\" text,\n\"likes\" int,\n\"year\" int,\n\"month\" text,\nprimary key(\"tip_id\")\nforeign key(\"business_id\") references business(\"business_id\"),\nforeign key(\"user_id\") references user(\"user_id\")\n\n);\n\n\n### Answer\nGiven the database schema, here is the SQL query that [QUESTION]在云南省的所有城市里找出一家名为海盗船自助餐的餐厅。[/QUESTION]\n[SQL]\n"
+        }
+    ]
+}'
+echo -e "\n"

@@ -8,7 +8,7 @@ import toml
 import uvicorn
 
 from app import app
-from models import init_chatglm, init_seq2seq, init_embeddings_model, download_model
+from models import init_clm, init_chatglm, init_seq2seq, init_embeddings_model, download_model
 from context import context, ModelFootpoint
 
 
@@ -77,7 +77,12 @@ def main():
                     print(f">> Download LLM model {llm_model} into {local_path}")
                     llm['path'] = local_path
 
-            if llm['type'] == 'chatglm':
+            if llm['type'] == 'clm':
+                print(f">> Use clm llm model {llm['path']}")
+                tokenizer, model = init_clm(
+                    llm['path'], args.device, args.gpus,
+                    cache_dir=context.cache_dir, **llm.get('kwargs', {}))
+            elif llm['type'] == 'chatglm':
                 print(f">> Use chatglm llm model {llm['path']}")
                 tokenizer, model = init_chatglm(
                     llm['path'], args.device, args.gpus, 

@@ -5,15 +5,6 @@ cache_dir = "./.cache"
 
 [models]
   [models.llm]
-    [models.llm."chatglm-6b"]
-    name = "chatglm-6b"
-    type = "chatglm"
-    path = "THUDM/chatglm-6b-int4"
-    #path = "/data/models/chatglm-6b-int4/"
-    tags = ["chat", "completion"]
-    #  [models.llm."chatglm-6b".kwargs]
-    #  quantization_bit = 8
-
     [models.llm."nl2sql-v2"]
     name = "nl2sql-v2"
     type = "seq2seq"
@@ -27,6 +18,21 @@ cache_dir = "./.cache"
       [models.llm."nl2sql-v2".gen_kwargs]
       start_token = "en_XX "
       stop_token = "</s>"
+
+    [models.llm."nl2sql-6b"]
+    name = "nl2sql-6b"
+    type = "chatglm"
+    path = "THUDM/chatglm-6b-int4"
+    #path = "/data/models/chatglm-6b-int4/"
+    tags = ["chat", "completion"]
+    #  [models.llm."chatglm-6b".kwargs]
+    #  quantization_bit = 8
+
+    [models.llm."nl2sql-7b"]
+    name = "nl2sql-7b"
+    type = "clm"
+    path = "/data1/xwb/models/sqlcoder-7b-2"
+    tags = ["chat", "completion"]
 
   [models.embeddings]
     [models.embeddings."chinese-large-emb"]
