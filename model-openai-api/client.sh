@@ -144,6 +144,7 @@ time curl ${API_BASE}/v1/chat/completions \
   -H "Authorization: Bearer $API_KEY" \
   -d '{
     "model": '\"${MODEL_NAME}\"',
+    "temperature": 0.2,
     "messages": [
         {
             "role": "user",
@@ -151,4 +152,15 @@ time curl ${API_BASE}/v1/chat/completions \
         }
     ]
 }'
+echo -e "\n"
+
+echo "/v1/chat/completions"
+time curl ${API_BASE}/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $API_KEY" \
+  -d '{
+    "model": '\"${MODEL_NAME}\"',
+    "messages": [{"role": "user", "content": "'"${PROMPT}"'Question: 一共多少学生 <sep> Tables: 142_0: table_name ; 2022_030-5x: xm , sfzhm , 合同开始时间 , 合同结束时间 , 岗位性质 , 公益性岗位名称 , 单位名称 , 所属区划 , 所属街道 , 登记失业地 , rylb , 是否困难人员就业 , 就业状态 , 人员登记备注 , 性别 , 民族 , 学历 , 健康状况 , 户籍地址 , 居住地址 , 联系电话 , 手机号码 , 经办人 , 经办日期 , 经办机构 , 年龄 , 公安死亡注销时间 , ga , 民政殡葬火化时间 , 卫健委医学死亡证明时间 , 5月是否缴纳养老 , 低保信息 , 残疾人信息 , qyzt , 贫困信息 , 失信信息 , 退休信息 , 判断结果 , 是否满36个月 , ybjk , yb ; 2022_030x: xm , sfzhm , 岗位性质 , 岗位类型 , 公益性岗位名称 , 用岗位名称 , 性别 , 民族 , 联系电话 , 学历 , 健康状况 , 户籍地址 , 居住地址 , 合同开始时间 , 合同结束时间 , 岗位性质1 , 岗位类型1 , 公益性岗位名称1 , 用岗单位名称 , 单位名称 , 所属区划 , 所属街道 , 登记失业地 , rylb , 是否困难人员就业 , 就业状态 , 社保银行 , 社保银行卡号 , 人员登记备注 , 用岗单位名称1 , 手机号码 , 经办人 , 经办日期 , 经办机构 ; 2022_030x-6: xm , sfzhm , 岗位性质 , 岗位类型 , 公益性岗位名称 , 用岗位名称 , 性别 , 民族 , 联系电话 , 学历 , 健康状况 , 户籍地址 , 居住地址 , 合同开始时间 , 合同结束时间 , 岗位性质1 , 岗位类型1 , 公益性岗位名称1 , 用岗单位名称 , 单位名称 , 所属区划 , 所属街道 , 登记失业地 , rylb , 是否困难人员就业 , 就业状态 , 社保银行 , 社保银行卡号 , 人员登记备注 , 用岗单位名称1 , 手机号码 , 经办人 , 经办日期 , 经办机构 ; 2022_030x_7: xm , sfzhm , 岗位性质 , 岗位类型 , 公益性岗位名称 , 用岗位名称 , 性别 , 民族 , 联系电话 , 学历 , 健康状况 , 户籍地址 , 居住地址 , 合同开始时间 , 合同结束时间 , 岗位性质1 , 岗位类型1 , 公益性岗位名称1 , 用岗单位名称 , 单位名称 , 所属区划 , 所属街道 , 登记失业地 , rylb , 是否困难人员就业 , 就业状态 , 社保银行 , 社保银行卡号 , 人员登记备注 , 用岗单位名称1 , 手机号码 , 经办人 , 经办日期 , 经办机构 ; 2022_030x_8: xm , sfzhm , 岗位性质 , 岗位类型 , 公益性岗位名称 , 用岗位名称 , 性别 , 民族 , 联系电话 , 学历 , 健康状况 , 户籍地址 , 居住地址 , 合同开始时间 , 合同结束时间 , 岗位性质1 , 岗位类型1 , 公益性岗位名称1 , 用岗单位名称 , 单位名称 , 所属区划 , 所属街道 , 登记失业地 , rylb , 是否困难人员就业 , 就业状态 , 社保银行 , 社保银行卡号 , 人员登记备注 , 用岗单位名称1 , 手机号码 , 经办人 , 经办日期 , 经办机构 ; 2022_kj: xm , sfzhm , xb , lb , nl , hjd , hjxx , cjdj , cjlb , sfpk , sfsw , nanname , nansfzh , nvname , nvsfzh , sfly , hyhy , hjjk1 , thry , cjr , pk , mzbz , gajk , wjw , nansfcj , nvsfcj , nansfpk , nvsfpk , nvsfsw , nansfsw , nansbxx , nvsbxx ; 2022_kj1: xm , sfzhm , xb , lb , nl , hjd , hjxx , cjdj , cjlb , sfpk , sfsw , nanname , nansfzh , nvname , nvsfzh , sfly , hyhy , hjjk1 , thry , cjr , pk , mzbz , gajk , wjw , nansfcj , nvsfcj , nansfpk , nvsfpk , nvsfsw , nansfsw , nansbxx , nvsbxx ; 2023_0: dwmc , 在职人数 , lx ; 2023_00: 证件类型 , sfzhm , xm , 类型 , bz , gajk , ga , mzbz , wjw , name <sep>"}],
+    "temperature": 0.001
+  }'
 echo -e "\n"

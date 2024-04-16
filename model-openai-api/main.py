@@ -81,17 +81,17 @@ def main():
                 print(f">> Use clm llm model {llm['path']}")
                 tokenizer, model = init_clm(
                     llm['path'], args.device, args.gpus,
-                    cache_dir=context.cache_dir, **llm.get('kwargs', {}))
+                    cache_dir=context.cache_dir, gpu_id=llm.get("gpu_id", 0), **llm.get('kwargs', {}))
             elif llm['type'] == 'chatglm':
                 print(f">> Use chatglm llm model {llm['path']}")
                 tokenizer, model = init_chatglm(
                     llm['path'], args.device, args.gpus, 
-                    cache_dir=context.cache_dir, **llm.get('kwargs', {}))
+                    cache_dir=context.cache_dir, gpu_id=llm.get("gpu_id", 0), **llm.get('kwargs', {}))
             elif llm['type'] == 'seq2seq':
                 print(f">> Use seq2seq llm model {llm['path']}")
                 tokenizer, model = init_seq2seq(
                     llm['path'], args.device, args.gpus, 
-                    cache_dir=context.cache_dir, **llm.get('kwargs', {}))
+                    cache_dir=context.cache_dir, gpu_id=llm.get("gpu_id", 0), **llm.get('kwargs', {}))
             else:
                 print(f">> [Warning] Unsupported LLM model type {llm['type']}")
                 continue
