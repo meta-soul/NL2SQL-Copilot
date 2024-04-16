@@ -1,4 +1,6 @@
 import os
+import re
+import time
 from copy import deepcopy
 from fastapi import APIRouter
 from fastapi import FastAPI, HTTPException, Request, status, BackgroundTasks
@@ -23,6 +25,7 @@ router = APIRouter()
 @router.post("/v1/schema_linking")
 async def schema_linking(body: SchemaLinkingBody, request: Request, background_tasks: BackgroundTasks):
     background_tasks.add_task(torch_gc)
+    start_time = time.time()
     if not context.service_args["public"]:
         check_token(request.headers, context.auth_tokens)
 
@@ -54,6 +57,7 @@ async def schema_linking(body: SchemaLinkingBody, request: Request, background_t
         table_pred_probs = total_table_pred_probs + [-1 for _ in range(
             table_num - len(total_table_pred_probs))]
     truncated_table_ids = []
+    already_truncated_table_ids = set()
     column_pred_probs = []
     # 因为序列长度有限 导致预测的表数量和数据中表数量不一致
     # 得到被截断的表id和column概率
@@ -74,21 +78,17 @@ async def schema_linking(body: SchemaLinkingBody, request: Request, background_t
     schema_linking_db["column_pred_probs"] = column_pred_probs
     schema_linking_db["table_pred_probs"] = table_pred_probs
 
-    if len(truncated_table_ids) > 0:
-        truncated_data_info = [0, truncated_table_ids]
-    # 对输入截断的表，列进行预测
-    # additionally, we need to consider and predict discarded tables and columns
-    # 有一种情况无法跳出循环 逻辑对截断部分的概率置为-1 然后将截断部分拼接重新判断 当某表及其列长度大于512时 末尾列总是-1 需要一直判断
-    while len(truncated_data_info) != 0:
+    window_num_tables = 5
+    for truncated_i in range(len(truncated_table_ids)):
+        truncated_tables = truncated_table_ids[truncated_i:truncated_i+window_num_tables]
         truncated_data = deepcopy(schema_linking_db)
-        # 被截断的db——schema
         truncated_data["schema_items"] = [truncated_data["schema_items"][table_id] for table_id in
-                                       truncated_table_ids]
+                                       truncated_tables]
 
         truncated_data["table_pred_probs"] = [truncated_data["table_pred_probs"][table_id] for table_id in
-                                              truncated_table_ids]
+                                              truncated_tables]
         truncated_data["column_pred_probs"] = [truncated_data["column_pred_probs"][table_id] for table_id in
-                                               truncated_table_ids]
+                                               truncated_tables]
 
         total_table_pred_probs, total_column_pred_probs = get_schema_linking_result(truncated_data,model,tokenizer)
 
@@ -112,23 +112,68 @@ async def schema_linking(body: SchemaLinkingBody, request: Request, background_t
                 column_pred_probs.append(
                         total_column_pred_probs[table_id] + [-1 for _ in range(truncated_column_num)])
 
-        for idx, truncated_table_id in enumerate(truncated_table_ids):
+        for idx, truncated_table_id in enumerate(truncated_tables):
             schema_linking_db["table_pred_probs"][truncated_table_id] = table_pred_probs[idx]
             schema_linking_db["column_pred_probs"][truncated_table_id] = column_pred_probs[idx]
 
-        # check if there are tables and columns in the new dataset that have not yet been predicted
-        truncated_data_info = []
-        table_num = len(schema_linking_db["schema_items"])
-        truncated_table_ids = []
-        for table_id in range(table_num):
-            # the current table is not predicted
-            if schema_linking_db["table_pred_probs"][table_id] == -1:
-                truncated_table_ids.append(table_id)
-            # some columns in the current table are not predicted
-            if schema_linking_db["table_pred_probs"][table_id] != -1 and -1 in schema_linking_db["column_pred_probs"][table_id]:
-                truncated_table_ids.append(table_id)
-            if len(truncated_table_ids) > 0:
-                    truncated_data_info.append([0, truncated_table_ids])
+
+    #if len(truncated_table_ids) > 0:
+    #    truncated_data_info = [0, truncated_table_ids]
+
+    ## 对输入截断的表，列进行预测
+    ## additionally, we need to consider and predict discarded tables and columns
+    ## 有一种情况无法跳出循环 逻辑对截断部分的概率置为-1 然后将截断部分拼接重新判断 当某表及其列长度大于512时 末尾列总是-1 需要一直判断
+    #while len(truncated_data_info) != 0:
+    #    truncated_data = deepcopy(schema_linking_db)
+    #    # 被截断的db——schema
+    #    truncated_data["schema_items"] = [truncated_data["schema_items"][table_id] for table_id in
+    #                                   truncated_table_ids]
+
+    #    truncated_data["table_pred_probs"] = [truncated_data["table_pred_probs"][table_id] for table_id in
+    #                                          truncated_table_ids]
+    #    truncated_data["column_pred_probs"] = [truncated_data["column_pred_probs"][table_id] for table_id in
+    #                                           truncated_table_ids]
+
+    #    total_table_pred_probs, total_column_pred_probs = get_schema_linking_result(truncated_data,model,tokenizer)
+    #    #already_truncated_table_ids.update(truncated_table_ids)
+
+    #    table_num = len(truncated_data["schema_items"])
+    #    if table_num == len(total_table_pred_probs):
+    #        table_pred_probs = total_table_pred_probs
+    #    else:
+    #        table_pred_probs = total_table_pred_probs + [-1 for _ in range(
+    #            table_num - len(total_table_pred_probs))]
+
+    #    column_pred_probs = []
+    #    for table_id in range(table_num):
+    #        if table_id >= len(total_column_pred_probs):
+    #            column_pred_probs.append([-1 for _ in range(len(truncated_data["schema_items"][table_id]["column_names"]))])
+    #            continue
+    #        if len(total_column_pred_probs[table_id]) == len(truncated_data["schema_items"][table_id]["column_names"]):
+    #            column_pred_probs.append(total_column_pred_probs[table_id])
+    #        else:
+    #            truncated_column_num = len(truncated_data["schema_items"][table_id]["column_names"]) - len(
+    #                    total_column_pred_probs[table_id])
+    #            column_pred_probs.append(
+    #                    total_column_pred_probs[table_id] + [-1 for _ in range(truncated_column_num)])
+
+    #    for idx, truncated_table_id in enumerate(truncated_table_ids):
+    #        schema_linking_db["table_pred_probs"][truncated_table_id] = table_pred_probs[idx]
+    #        schema_linking_db["column_pred_probs"][truncated_table_id] = column_pred_probs[idx]
+
+    #    # check if there are tables and columns in the new dataset that have not yet been predicted
+    #    truncated_data_info = []
+    #    table_num = len(schema_linking_db["schema_items"])
+    #    truncated_table_ids = []
+    #    for table_id in range(table_num):
+    #        # the current table is not predicted
+    #        if schema_linking_db["table_pred_probs"][table_id] == -1:
+    #            truncated_table_ids.append(table_id)
+    #        # some columns in the current table are not predicted
+    #        if schema_linking_db["table_pred_probs"][table_id] != -1 and -1 in schema_linking_db["column_pred_probs"][table_id]:
+    #            truncated_table_ids.append(table_id)
+    #        if len(truncated_table_ids) > 0:
+    #                truncated_data_info.append([0, truncated_table_ids])
 
     final_schema_link_tables, final_schema_link_columns = [], []
     all_tables, all_columns = [], []
@@ -143,6 +188,9 @@ async def schema_linking(body: SchemaLinkingBody, request: Request, background_t
                                                                schema_linking_db["column_pred_probs"],
                                                                schema_linking_db["schema_items"]):
         table_name = schema_item["table_name_original"]
+        # remove irrevelant tables
+        if re.match(r'^\d+', table_name):
+            continue
         # table_name = schema_item["table_name"]
         all_tables.append(table_name)
         schema_link_columns = []
@@ -177,6 +225,11 @@ async def schema_linking(body: SchemaLinkingBody, request: Request, background_t
             "final_schema_link_tables": show_schema_link_tables,
             "final_schema_link_columns": show_schema_link_columns,
         })
+
+    print(">> Schema Linking Tables", len(schema_linking_db["schema_items"]), "->", len(show_schema_link_tables))
+    print(">> Schema Linking Results", [x['table_name'] for x in schema_linking_db["schema_items"]], "->", final_schema_link_tables)
+    print(">> Response: {}".format(generate_schema_linking_response(data, model=body.model)))
+    print(">> During {}s".format(time.time()-start_time))
 
     return JSONResponse(status_code=200, content=generate_schema_linking_response(data, model=body.model))
 

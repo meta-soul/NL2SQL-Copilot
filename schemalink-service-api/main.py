@@ -67,7 +67,7 @@ def main():
             tokenizer, 
             schema_linking_model_args.get('tags', [])
         )
-        print(f"> Load DONE!"
+        print(f"> Load DONE!")
 
     # Start server and tunneling
     print(f"> Start API server on port[{args.port}]...")
