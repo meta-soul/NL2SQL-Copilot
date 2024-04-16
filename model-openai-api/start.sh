@@ -25,7 +25,9 @@ if [ -s "$pid_file" ]; then
     sleep 2
 fi
 
-PYTHONUNBUFFERED=x nohup python3 -u main.py --config ${CONF} \
+export PYTHONPATH=./src
+
+PYTHONUNBUFFERED=x nohup python3 -u src/main.py --config ${CONF} \
   --llm_model="${models}" \
   --port ${PORT} \
   > ${log_file} 2>&1 & echo $! > ${pid_file}

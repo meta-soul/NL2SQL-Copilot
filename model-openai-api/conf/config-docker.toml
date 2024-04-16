@@ -1,0 +1,52 @@
+[service]
+host = "0.0.0.0"
+port = 18021
+cache_dir = "./.cache"
+
+[models]
+  [models.llm]
+    [models.llm."nl2sql-v2"]
+    name = "nl2sql-v2"
+    type = "seq2seq"
+    #path = "DMetaSoul/nl2sql-chinese-basic"
+    path = "/opt/nl2sql/model-openai-api/models/nl2sql-chinese-basic"
+    tags = ["chat"]
+    gpu_id = 0
+      [models.llm."nl2sql-v2".gen_kwargs]
+      start_token = "en_XX "
+      stop_token = "</s>"
+
+    [models.llm."nl2sql-6b"]
+    name = "nl2sql-6b"
+    type = "chatglm"
+    #path = "THUDM/chatglm-6b-int4"
+    path = "/opt/nl2sql/model-openai-api/models/chatglm-6b-int4"
+    tags = ["chat", "completion"]
+    gpu_id = 0
+    #  [models.llm."chatglm-6b".kwargs]
+    #  quantization_bit = 8
+
+    [models.llm."nl2sql-7b"]
+    name = "nl2sql-7b"
+    type = "clm"
+    path = "/opt/nl2sql/model-openai-api/models/sqlcoder-7b-2"
+    tags = ["chat", "completion"]
+    gpu_id = 0
+
+  [models.embeddings]
+    [models.embeddings."chinese-large-emb"]
+    name = "chinese-large-emb"
+    type = "default"
+    path = "DMetaSoul/Dmeta-embedding"
+    tags = ["embedding", "chinese"]
+      [models.embeddings."chinese-large-emb".kwargs]
+      max_seq_length = 1024
+
+[auth]
+tokens = [
+  "ak_84ff9c1c-4758-494b-b6fd-2f21f06650c3", 
+  "ak_311e0e1b-2e4a-44b6-8213-ae19b6fccb81", 
+  "ak_66e86f1b-0e6b-4509-8547-c409c8c8d5cd",
+  "ak_2bd1bf7f-85ee-4f55-baa2-7529c7afa95b",
+  "ak_1653f112-12b3-43c9-ad86-d125a9bae887"
+]
