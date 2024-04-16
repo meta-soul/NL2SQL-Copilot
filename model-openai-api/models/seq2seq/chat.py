@@ -16,8 +16,8 @@ def init_model_args(model_args = None):
         model_args['temperature'] = 0.001
     if model_args['temperature'] > 1:
         model_args['temperature'] = 1
-    if model_args['max_tokens'] > 1024:
-        model_args['max_tokens'] = 1024
+    if model_args['max_tokens'] > 512:
+        model_args['max_tokens'] = 512
 
     return model_args
 
@@ -84,7 +84,7 @@ def generate_stream(model, tokenizer, params, device, context_len=2048, stream_i
     stop_str = params.get("stop", None)
     stop_token_ids = params.get("stop_ids", [tokenizer.eos_token_id])
 
-    input_ids = tokenizer(prompt).input_ids
+    input_ids = tokenizer(prompt, max_length=1000, truncation=True).input_ids
 
     output_ids = list(input_ids)
     l_prompt = len(tokenizer.decode(input_ids, skip_special_tokens=False))

@@ -5,17 +5,20 @@ from .chat import do_chat, do_chat_stream
 
 def init_seq2seq(model_path: str, device: str, num_gpus: int, **kwargs):
     if device == "cpu":
-        kwargs = {}
+        hf_kwargs = {}
     elif device == "gpu":
-        kwargs = {"torch_dtype": torch.float16}
-        kwargs["device_map"] = "sequential"  # This is important for not the same VRAM sizes
+        hf_kwargs = {"torch_dtype": torch.float16}
+        #hf_kwargs["device_map"] = "sequential" # This is important for not the same VRAM sizes
     else:
         raise ValueError(f"Invalid device: {device}")
 
     tokenizer = AutoTokenizer.from_pretrained(model_path, cache_dir=kwargs.get('cache_dir'))
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_path, **kwargs)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_path, cache_dir=kwargs.get('cache_dir'), **hf_kwargs)
 
-    model.running_device = "cuda" if device == "gpu" else "cpu"
+    gpu_id = kwargs.get("gpu_id", None)
+    model.eval()
+    model.running_device = ("cuda" if gpu_id is None else f"cuda:{gpu_id}") if device == "gpu" else "cpu"
+    model.to(model.running_device)
     model.encoder = model.get_encoder()
     model.decoder = model.get_decoder()
     model.do_chat = do_chat

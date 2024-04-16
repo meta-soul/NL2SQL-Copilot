@@ -20,9 +20,10 @@ def init_clm(model_path: str, running_device: str = "GPU", gpus: int = 1,
          cache_dir=kwargs.get("cache_dir"), 
          force_download=kwargs.get("force_download", False))
 
+    gpu_id = kwargs.get("gpu_id", None)
     if running_device.upper() == "GPU":
         model = load_model_on_gpus(model_path, gpus, 
-            config=config, quantization_bit=quantization_bit, dtype=dtype)
+            config=config, quantization_bit=quantization_bit, dtype=dtype, gpu_id=gpu_id)
     else:
         model = AutoModelForCausalLM.from_pretrained(model_path, config=config, 
             trust_remote_code=True, torch_dtype=dtype,
@@ -30,7 +31,7 @@ def init_clm(model_path: str, running_device: str = "GPU", gpus: int = 1,
         model = model.float()
 
     model.eval()
-    model.running_device = "cuda" if running_device == "gpu" else "cpu"
+    model.running_device = ("cuda" if gpu_id is None else f"cuda:{gpu_id}") if running_device == "gpu" else "cpu"
     model.do_chat = do_chat
     model.do_chat_stream = do_chat_stream
     model.do_completion = model.do_chat
@@ -66,13 +67,14 @@ def load_model_on_gpus(checkpoint_path: Union[str, os.PathLike],
                        config: Optional[AutoConfig] = None, 
                        quantization_bit: int = None,
                        dtype = torch.float16,
+                       gpu_id = None,
                        **kwargs) -> Module:
     if num_gpus < 2 and device_map is None:
         model = AutoModelForCausalLM.from_pretrained(
             checkpoint_path, config=config, 
             trust_remote_code=True, torch_dtype=dtype, 
-            device_map="auto", **kwargs)
-        model.cuda()
+            device_map="auto" if gpu_id is None else gpu_id, **kwargs)
+        #model.cuda()
     else:
         if num_gpus > torch.cuda.device_count():
             raise Exception(f"need {num_gpus} GPU, but only has {torch.cuda.device_count()}")

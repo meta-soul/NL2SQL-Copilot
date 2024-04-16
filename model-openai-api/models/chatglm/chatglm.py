@@ -35,10 +35,11 @@ def init_chatglm(model_path: str, running_device: str, gpus: int,
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True,
          cache_dir=kwargs.get("cache_dir"))
 
+    gpu_id = kwargs.get("gpu_id", None)
     if running_device.upper() == "GPU":
         model = load_model_on_gpus(model_path, gpus, 
             config=config, ptuning_checkpoint=ptuning_checkpoint, 
-            quantization_bit=quantization_bit)
+            quantization_bit=quantization_bit, gpu_id=gpu_id)
 
         if ptuning_checkpoint and pre_seq_len:
             model.transformer.prefix_encoder.float()
@@ -91,19 +92,25 @@ def load_model_on_gpus(checkpoint_path: Union[str, os.PathLike], num_gpus: int =
                        config: Optional[AutoConfig] = None, 
                        ptuning_checkpoint: str = None, 
                        quantization_bit: int = None,
+                       gpu_id: int = None,
                        **kwargs) -> Module:
     if num_gpus < 2 and device_map is None:
         model = AutoModel.from_pretrained(
-            checkpoint_path, config=config, trust_remote_code=True, **kwargs)
+            checkpoint_path, config=config, 
+            trust_remote_code=True, **kwargs)
         
-        model = load_ptuning_checkpoint(model, ptuning_checkpoint)
+        if ptuning_checkpoint:
+            model = load_ptuning_checkpoint(model, ptuning_checkpoint)
 
         if quantization_bit:
             model = model.quantize(quantization_bit)
 
-        model = model.half()
+        if gpu_id is not None:
+            model = model.to(gpu_id)
+            #model.device = f"cuda:{gpu_id}"
 
-        model.cuda()
+        model = model.half()
+        #model.cuda()
     else:
         if num_gpus > torch.cuda.device_count():
             raise Exception(f"need {num_gpus} GPU, but only has {torch.cuda.device_count()}")

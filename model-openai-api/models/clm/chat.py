@@ -127,6 +127,8 @@ def generate_stream(model, tokenizer, params, device, context_len=2048, stream_i
 
         if token in stop_token_ids:
             stopped = True
+            if output_ids:
+                output_ids.pop()
         else:
             stopped = False
 
