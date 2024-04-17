@@ -20,7 +20,9 @@ log_file=./logs/start.${ds}.log
 #kill -9 `cat ${pid_file}` > /dev/null 2>&1
 #sleep 2
 
-PYTHONUNBUFFERED=x nohup python3 -u main.py --config ${CONF} --port ${PORT} > ${log_file} 2>&1 & echo $! > ${pid_file}
+export PYTHONPATH=./src
+
+PYTHONUNBUFFERED=x nohup python3 -u src/main.py --config ${CONF} --port ${PORT} > ${log_file} 2>&1 & echo $! > ${pid_file}
 
 pid=$(cat ${pid_file})
 echo "PID: ${pid}"
