@@ -7,3 +7,4 @@ loguru==0.6.0
 toml==0.10.2
 requests==2.25.1
 sqlparse==0.4.3
+sse-starlette==1.6.1

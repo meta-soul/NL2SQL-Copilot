@@ -18,4 +18,6 @@ mkdir -p logs
 ds=`date +%Y%m%d%H%M%S`
 log_file=./logs/start.${ds}.log
 
+export PYTHONPATH=./src
+
 PYTHONUNBUFFERED=x nohup python -u main.py --port "${PORT}" --config ${CONF} > ${log_file} 2>&1 & echo $! > ${pid_file}

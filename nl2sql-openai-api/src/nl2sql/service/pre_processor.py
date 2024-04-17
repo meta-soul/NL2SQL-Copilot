@@ -9,12 +9,6 @@ from copy import deepcopy
 
 from loguru import logger
 
-import torch
-from torch.utils.data import DataLoader
-
-from transformers.trainer_utils import set_seed
-from transformers import XLMRobertaTokenizerFast
-
 
 class PreProcessorChatPayloadParser(object):
     _processor_name = "pre_chat_payload_parser"
