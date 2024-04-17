@@ -102,6 +102,10 @@
           # the input chat2db's prompt version
           kwargs = {prompt_version="v3"}
         [[openai.service."llm-6b".conf.pre]]
+          name = "pre_schema_linking_parser"
+          args = []
+          kwargs = { base_url="http://schemalink-service-api:80", timeout=5, use_schema_linking_min_tables=2, model_name="schema-linking-base", table_threshold=0.0, column_threshold=0.0, max_table_nums=10, max_column_nums=50 }
+        [[openai.service."llm-6b".conf.pre]]
           name = "pre_prompt_generator"
           args = []
           kwargs = {}
@@ -133,6 +137,10 @@
           args = []
           # the input chat2db's prompt version
           kwargs = {prompt_version="v3"}
+        [[openai.service."llm-7b".conf.pre]]
+          name = "pre_schema_linking_parser"
+          args = []
+          kwargs = { base_url="http://schemalink-service-api:80", timeout=5, use_schema_linking_min_tables=2, model_name="schema-linking-base", table_threshold=0.0, column_threshold=0.0, max_table_nums=10, max_column_nums=50 }
         [[openai.service."llm-7b".conf.pre]]
           name = "pre_prompt_generator"
           args = []

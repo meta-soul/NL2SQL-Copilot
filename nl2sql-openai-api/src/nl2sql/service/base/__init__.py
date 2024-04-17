@@ -86,9 +86,13 @@ class ServiceBase:
             try:
                 res, status = pre_f(payload, context=pre_res), True
             except Exception as e:
+                error = str(e)
                 res, status = {}, False
             during_time = int((time.time() - during_time)*1000)
-            logger.info(f"[service = {self.name}] [pre_processor = {pre_f._processor_name}] [status = {status}] [during = {during_time}ms]")
+            if status:
+                logger.info(f"[service = {self.name}] [pre_processor = {pre_f._processor_name}] [status = {status}] [during = {during_time}ms]")
+            else:
+                logger.info(f"[service = {self.name}] [pre_processor = {pre_f._processor_name}] [status = {status}] [during = {during_time}ms] [error={error}]")
             pre_res.update(res)
         return pre_res
 

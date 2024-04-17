@@ -162,10 +162,11 @@ class DatabaseSchemaBase:
 
     def update(self, schema_tables, schema_columns):
         new_tables={}
-        for table_idx, table in enumerate(self.tables.values()):
+        for _, table in enumerate(self.tables.values()):
             table_name = table.name
             if table_name not in schema_tables:
                 continue
+            table_idx = schema_tables.index(table_name)
             columns = table.columns
             new_columns = []
             for column in columns:
