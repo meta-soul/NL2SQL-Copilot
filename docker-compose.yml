@@ -1,0 +1,58 @@
+services:
+  chat2db:
+    image: shaw001/chat2db-ui
+    volumes:
+      - chat2db_data:/root/.chat2db
+    networks:
+      - nl2sql
+    ports:
+      - 18020:80
+    depends_on:
+      - nl2sql-openai-api
+
+  nl2sql-openai-api:
+    image: shaw001/nl2sql-openai-api
+    networks:
+      nl2sql:
+        aliases:
+          - nl2sql-openai-api
+    ports:
+      - 18080:80
+    depends_on:
+      - model-openai-api
+      - schemalink-service-api
+
+  model-openai-api:
+    image: shaw001/model-openai-api
+    networks:
+      nl2sql:
+        aliases:
+          - model-openai-api
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  schemalink-service-api:
+    image: shaw001/schemalink-service-api
+    networks:
+      nl2sql:
+        aliases:
+          - schemalink-service-api
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  chat2db_data: 
+
+networks:
+  nl2sql:
+    driver: bridge
