@@ -181,3 +181,29 @@
           args = []
           kwargs = {}
 
+    [openai.service.codegeex]
+      type = "openai"
+      route_prefix = "/chatglm"
+      base_url = "https://api.siliconflow.cn"
+      timeout = 300
+      [openai.service.codegeex.conf]
+        [openai.service.codegeex.conf.model]
+          # the model name pass to model api
+          name = "zhipuai/glm4-9B-chat"
+        [openai.service.codegeex.conf.prompt]
+          # the generated prompt's version for model input
+          # v1 => codex style, v2 => chatgpt style
+          version = "v2"
+        [[openai.service.codegeex.conf.pre]]
+          name = "pre_chat_payload_parser"
+          args = []
+          kwargs = {}
+        [[openai.service.codegeex.conf.pre]]
+          name = "pre_prompt_parser"
+          args = []
+          # the input chat2db's prompt version
+          kwargs = {prompt_version="v3"}
+        [[openai.service.codegeex.conf.pre]]
+          name = "pre_prompt_generator"
+          args = []
+          kwargs = {}

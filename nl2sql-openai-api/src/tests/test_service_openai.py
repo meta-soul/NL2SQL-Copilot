@@ -122,7 +122,7 @@ Question: 一共有多少超级英雄"""
 payload = {'model': 'gpt-3.5-turbo', 'messages': [{'role': 'user', 'content': content}]}
 
 conf = {}
-with open('./conf/config.toml', 'r') as f:
+with open('../conf/config-example.toml', 'r') as f:
     conf = toml.load(f)
 
 for name, service_args in conf['openai']['service'].items():

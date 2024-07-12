@@ -5,7 +5,7 @@ if [ -z "${PORT}" ]; then
     PORT=18080
 fi
 if [ -z "$CONF" ]; then
-    CONF=conf/config.toml
+    CONF=conf/config-example.toml
 fi
 
 pid_file=start.pid
@@ -20,4 +20,4 @@ log_file=./logs/start.${ds}.log
 
 export PYTHONPATH=./src
 
-PYTHONUNBUFFERED=x nohup python -u main.py --port "${PORT}" --config ${CONF} > ${log_file} 2>&1 & echo $! > ${pid_file}
+PYTHONUNBUFFERED=x nohup python -u ./src/main.py --port "${PORT}" --config ${CONF} > ${log_file} 2>&1 & echo $! > ${pid_file}
